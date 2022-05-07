@@ -57,6 +57,19 @@ CREATE TABLE POST_COMMENT (
 
 DELIMITER $$
 
+CREATE PROCEDURE INIT ()
+BEGIN
+	-- Initializes the database with stock content
+    
+	INSERT INTO POST (Title, FileExt) VALUES ("Harry_Potter", "jpeg");
+	INSERT INTO POST (Title, FileExt) VALUES ("John_Wick", "jpg");
+	INSERT INTO POST (Title, FileExt) VALUES ("Pursuit_of_Depression", "jpeg");
+	INSERT INTO POST (Title, FileExt) VALUES ("Sick_Day", "jpg");
+	INSERT INTO POST (Title, FileExt) VALUES ("Sleepover", "jpg");
+	INSERT INTO POST (Title, FileExt) VALUES ("Year_2020", "jpeg");
+    
+END $$
+
 CREATE PROCEDURE CLEAN ()
 BEGIN
 	-- Resets the database between tests
@@ -223,10 +236,5 @@ END $$
 
 DELIMITER ;
 
-INSERT INTO POST (Title, FileExt) VALUES ("Harry_Potter", "jpeg");
-INSERT INTO POST (Title, FileExt) VALUES ("John_Wick", "jpg");
-INSERT INTO POST (Title, FileExt) VALUES ("Pursuit_of_Depression", "jpeg");
-INSERT INTO POST (Title, FileExt) VALUES ("Sick_Day", "jpg");
-INSERT INTO POST (Title, FileExt) VALUES ("Sleepover", "jpg");
-INSERT INTO POST (Title, FileExt) VALUES ("Year_2020", "jpeg");
+
 
