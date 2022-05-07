@@ -4,7 +4,11 @@ const express = require('express');
 const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
-const crypto = require('crypto');
+
+
+const {hash, genSessionKey} = require('./server_helper');
+
+
 
 const app = express();
 app.use(express.json());
@@ -39,7 +43,6 @@ console.log("DB_PORT: " + dbPort);
 console.log("SECRET: " + secret);
 console.log("SERVER_PORT: " + serverPort + "\n\n");
 
-
 app.get('/', (req, res) => {
 	res.send("Hello World!");
 });
@@ -61,7 +64,7 @@ app.get('/register/:username/:password', (req, res) => {
 
 		SET @wasSuccess = FALSE;
 
-		CALL CREATE_AGENT ('${req.params.username}', '${hash(req.params.password)}', @wasSuccess);
+		CALL CREATE_AGENT ('${req.params.username}', '${hash(req.params.password, secret)}', @wasSuccess);
 
 		SELECT @wasSuccess AS wasSuccess;
 
@@ -124,19 +127,7 @@ function query(text) {
 
 }
 
-function hash(text) {
 
-	return crypto.createHmac('sha256', secret).update(text).digest('hex');
-
-}
-
-function genSessionKey() {
-
-	const size = 128;
-
-	return [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-
-}
 
 function loginHelper(req, res) {
 
@@ -144,7 +135,7 @@ function loginHelper(req, res) {
 
 		SET @wasSuccess = FALSE;
 
-		CALL LOGIN ('${req.params.username}', '${hash(req.params.password)}', '${genSessionKey()}', @wasSuccess);
+		CALL LOGIN ('${req.params.username}', '${hash(req.params.password, secret)}', '${genSessionKey()}', @wasSuccess);
 
 		SELECT @wasSuccess AS wasSuccess;
 
