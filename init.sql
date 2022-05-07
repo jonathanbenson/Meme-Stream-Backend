@@ -51,6 +51,11 @@ DELIMITER $$
 
 CREATE PROCEDURE CREATE_AGENT (IN agentUsername VARCHAR(16), IN passwordHash CHAR(64), OUT message VARCHAR(32))
 BEGIN
+    /*
+
+    Stored procedure to create a new agent (user) in the database.
+
+    */
 
 	-- check if the user already exists in the databsase
 	IF (NOT EXISTS (SELECT Username FROM AGENT WHERE Username = agentUsername)) THEN
@@ -79,6 +84,12 @@ END $$
 
 CREATE PROCEDURE AUTHENTICATE_AGENT (IN agentUsername VARCHAR(16), IN sessionKey CHAR(128), OUT isValid BOOL)
 BEGIN
+    /*
+
+    Stored procedure to check if there is an entry in SESSION_KEY with the AgentUsername and SessionKey of
+    those provided as arguments.
+
+    */
 
 	-- if there is not a match, then the user is not authenticated
 	SET isValid = FALSE;
@@ -97,6 +108,11 @@ END $$
 
 CREATE PROCEDURE RATE_POST (IN agentUsername VARCHAR(16), IN postTitle VARCHAR(32), IN postRating INT)
 BEGIN
+    /*
+
+    Stored procedure to submit/update a rating for a post in the POST_RATING table.
+
+    */
 
 	-- check if the user has already rated the post
 	IF (NOT EXISTS (SELECT Rating FROM POST_RATING WHERE PostTitle = postTitle AND AgentUsername = agentUsername)) THEN
