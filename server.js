@@ -3,6 +3,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const app = express();
 const path = require('path');
+const fs = require('fs');
 
 dotenv.config();
 
@@ -37,7 +38,12 @@ app.get('/', (req, res) => {
 
 app.get('/post/:title/:fileExt', (req, res) => {
 
-	res.sendFile(path.join(__dirname, 'content', `${req.params.title}.${req.params.fileExt}`));
+	const filePath = path.join(__dirname, 'content', `${req.params.title}.${req.params.fileExt}`);
+
+	if (fs.existsSync(filePath))
+		res.sendFile(filePath);
+	else
+		res.send("Could not load content");
 
 });
 
