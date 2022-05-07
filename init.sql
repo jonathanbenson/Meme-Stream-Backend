@@ -47,8 +47,35 @@ CREATE TABLE POST_RATING (
     
 );
 
-
 DELIMITER $$
+
+CREATE PROCEDURE CREATE_AGENT (IN agentUsername VARCHAR(16), IN passwordHash CHAR(64), OUT message VARCHAR(32))
+BEGIN
+
+	-- check if the user already exists in the databsase
+	IF (NOT EXISTS (SELECT Username FROM AGENT WHERE Username = agentUsername)) THEN
+    BEGIN
+    
+		-- if the user does not exist in the database
+        -- then insert the new user into the database
+		INSERT INTO AGENT (Username, PasswordHash)
+        VALUES (agentUsername, passwordHash);
+    
+		-- output a success message
+		SET message = "SUCCESS";
+    
+    END;
+    ELSE
+    BEGIN
+		
+        -- if the user already exists in the database
+        -- then output an error message
+        SET message = "ERROR - Username already exists!";
+        
+    END;
+    END IF;
+
+END $$
 
 CREATE PROCEDURE RATE_POST (IN agentUsername VARCHAR(16), IN postTitle VARCHAR(32), IN postRating INT)
 BEGIN
