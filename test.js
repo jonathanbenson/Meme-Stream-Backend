@@ -185,7 +185,8 @@ describe('stored procedures', () => {
         const sessionKey = genSessionKey();
 
         const invalidUsername = "x";
-        const invalidPassword = hash('y', secret);
+        const invalidPasswordHash = hash('y', secret);
+        const sessionKey2 = genSessionKey();
 
         return query(`
 
@@ -222,6 +223,72 @@ describe('stored procedures', () => {
 
             expect(wasSuccess).toEqual(1);
             expect(existsSessionKey).toEqual(1);
+
+        }).then(() => query(`
+
+            SET @wasSuccess = FALSE;
+
+            CALL LOGIN ('${invalidUsername}', '${passwordHash}', '${sessionKey2}', @wasSuccess);
+
+            SELECT @wasSuccess AS wasSuccess;
+
+            SET @existsSessionKey = (
+                EXISTS (
+                    SELECT AgentUsername
+                    FROM SESSION_KEY
+                    WHERE AgentUsername = '${invalidUsername}' AND SessionKey = '${sessionKey2}'
+                )
+            );
+
+            SELECT @existsSessionKey AS existsSessionKey;
+
+        `)).then(result => {
+            /*
+
+            User with invalid username, but correct password tries to login
+
+            User should not be able to login.
+
+            */
+
+            const wasSuccess = result[2][0].wasSuccess;
+            const existsSessionKey = result[4][0].existsSessionKey;
+
+            expect(wasSuccess).toEqual(0);
+            expect(existsSessionKey).toEqual(0);
+
+        }).then(() => query(`
+
+            SET @wasSuccess = FALSE;
+
+            CALL LOGIN ('${username}', '${invalidPasswordHash}', '${sessionKey2}', @wasSuccess);
+
+            SELECT @wasSuccess AS wasSuccess;
+
+            SET @existsSessionKey = (
+                EXISTS (
+                    SELECT AgentUsername
+                    FROM SESSION_KEY
+                    WHERE AgentUsername = '${username}' AND SessionKey = '${sessionKey2}'
+                )
+            );
+
+            SELECT @existsSessionKey AS existsSessionKey;
+
+        `)).then(result => {
+            /*
+
+            User with valid username, but invalid password tries to login
+
+            User should not be able to login.
+
+            */
+
+            const wasSuccess = result[2][0].wasSuccess;
+            const existsSessionKey = result[4][0].existsSessionKey;
+
+            expect(wasSuccess).toEqual(0);
+            expect(existsSessionKey).toEqual(0);
 
         });
 
