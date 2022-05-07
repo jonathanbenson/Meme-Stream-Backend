@@ -50,7 +50,7 @@ CREATE TABLE POST_RATING (
 
 DELIMITER $$
 
-CREATE PROCEDURE RATE_POST (IN agentUsername VARCHAR(16), IN postTitle VARCHAR(32), IN postRating INT, OUT message VARCHAR(32))
+CREATE PROCEDURE RATE_POST (IN agentUsername VARCHAR(16), IN postTitle VARCHAR(32), IN postRating INT)
 BEGIN
 
 	-- check if the user has already rated the post
@@ -76,3 +76,4 @@ BEGIN
 	END IF;
         
 END $$
+
