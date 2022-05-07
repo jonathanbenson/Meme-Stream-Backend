@@ -8,7 +8,9 @@ CREATE TABLE AGENT (
 	-- Typical user account with username and password
     
 	Username VARCHAR(16) PRIMARY KEY NOT NULL UNIQUE,
-    Pass VARCHAR(32) NOT NULL
+
+    -- Uses the SHA-256 algorithm
+    PasswordHash CHAR(64) NOT NULL
     
 );
 
