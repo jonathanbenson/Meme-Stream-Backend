@@ -143,6 +143,32 @@ BEGIN
 
 END $$
 
+CREATE PROCEDURE LIKE_POST (IN agentName VARCHAR(16), IN sessionKey CHAR(128), IN pTitle VARCHAR(32))
+BEGIN
+	/*
+    
+    Inserts a new record into POST_LIKE with the agent's username and post title
+    ... provided that the user has not already liked the post.
+    
+    */
+
+	SET @isAuthenticated = FALSE;
+    
+    CALL AUTHENTICATE (agentName, sessionKey, @isAuthenticated);
+    
+    IF (@isAuthenticated AND NOT EXISTS (SELECT AgentUsername FROM POST_LIKE WHERE AgentUsername = agentName AND PostTitle = pTitle)) THEN
+    BEGIN
+    
+		INSERT INTO POST_LIKE (AgentUsername, PostTitle)
+        VALUES (agentName, pTitle);
+    
+    END;
+    END IF;
+
+END $$
+
+
+DELIMITER ;
 
 INSERT INTO POST (Title, FileExt) VALUES ("Harry_Potter", "jpeg");
 INSERT INTO POST (Title, FileExt) VALUES ("John_Wick", "jpg");
