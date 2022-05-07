@@ -77,6 +77,24 @@ BEGIN
 
 END $$
 
+CREATE PROCEDURE AUTHENTICATE_AGENT (IN agentUsername VARCHAR(16), IN sessionKey CHAR(128), OUT isValid BOOL)
+BEGIN
+
+	-- if there is not a match, then the user is not authenticated
+	SET isValid = FALSE;
+    
+    -- check if there is an entry in SESSION_KEY where the username and session key match those provided
+    IF (EXISTS (SELECT AgentUsername FROM SESSION_KEY WHERE AgentUsername = agentUsername AND SessionKey = sessionKey)) THEN
+    BEGIN
+    
+		-- if there is a match, then the user is authenticated
+		SET isValid = TRUE;
+    
+    END;
+    END IF;
+
+END $$
+
 CREATE PROCEDURE RATE_POST (IN agentUsername VARCHAR(16), IN postTitle VARCHAR(32), IN postRating INT)
 BEGIN
 
