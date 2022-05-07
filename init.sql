@@ -16,11 +16,9 @@ CREATE TABLE AGENT (
 
 CREATE TABLE SESSION_KEY (
 	-- Authentication for users when they login and interact with the app
-    -- The keys will expire after a certain amount of time being inactive
     
 	SessionKey CHAR(128) PRIMARY KEY NOT NULL UNIQUE,
-	AgentUsername VARCHAR(16) NOT NULL,
-    LastUpdated TIMESTAMP NOT NULL
+	AgentUsername VARCHAR(16) NOT NULL
     
 );
 
@@ -101,6 +99,53 @@ BEGIN
 		-- if there is a match, then the user is authenticated
 		SET isValid = TRUE;
     
+    END;
+    END IF;
+
+END $$
+
+CREATE PROCEDURE LOGIN (IN agentUsername VARCHAR(16), IN passwordHash CHAR(64), IN newSessionKey CHAR(128), OUT wasSuccess BOOL)
+BEGIN
+	/*
+    
+    Stored procedure to login a user.
+    
+    */
+
+	DECLARE existsSessionKey BOOL DEFAULT FALSE;
+
+	SET wasSuccess = FALSE;
+    
+    -- Check if the user has correct username and password
+	IF (EXISTS (SELECT Username FROM AGENT WHERE Username = agentUsername AND PasswordHash = passwordHash)) THEN
+    BEGIN
+    
+		CALL AUTHENTICATE_AGENT (existsSessionKey);
+        
+        -- check if the user is already logged in (probably from another machine somewhere)
+        IF (existsSessionKey) THEN
+        BEGIN
+        
+			-- if the user is already logged in
+            -- then update the session key to the newly generated key
+			UPDATE SESSION_KEY
+            SET SessionKey = newSessionKey
+            WHERE SessionKey = newSessionKey;
+        
+        END;
+        ELSE
+        BEGIN
+            
+            -- if the user is not already logged in
+            -- then give the user a new session key (new record in SESSION_KEY)
+			INSERT INTO SESSION_KEY (SessionKey, AgentUsername)
+            VALUES (newSessionKey, agentUsername);
+        
+        END;
+        END IF;
+		
+		SET wasSuccess = TRUE;
+        
     END;
     END IF;
 
