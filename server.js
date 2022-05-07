@@ -39,5 +39,42 @@ app.listen(serverPort, () => {
 });
 
 
+function query(text) {
+	/*
 
+	Queries the database. Returns any rows that are retrieved from a SELECT statement.
+
+	*/
+
+	return new Promise((resolve, reject) => {
+
+		let connection = mysql.createConnection({
+ 
+			host: "localhost",
+			user: dbUsername,
+			password: dbPassword,
+			database: dbName,
+			port: dbPort,
+			multipleStatements: true
+		 
+		});
+
+		connection.connect();
+
+		connection.query(
+			text,
+
+			function(error, results, fields) {
+
+				connection.end();
+
+				if (error) return reject(error);
+
+				return resolve(results);
+
+			});
+
+		});
+
+}
 
