@@ -152,6 +152,27 @@ describe('stored procedures', () => {
 
             expect(isAuthenticated).toEqual(0);
 
+        }).then(() => query(`
+
+            SET @isAuthenticated = FALSE;
+
+            CALL AUTHENTICATE_AGENT ('${invalidUsername}', '${sessionKey}', @isAuthenticated);
+
+            SELECT @isAuthenticated AS isAuthenticated;
+
+        `)).then(result => {
+            /*
+
+            Try to authenticate invalid username with valid session key.
+
+            User should be denied authentication.
+
+            */
+
+            const isAuthenticated = result[2][0].isAuthenticated;
+
+            expect(isAuthenticated).toEqual(0);
+
         });
 
 
