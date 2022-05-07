@@ -105,7 +105,7 @@ BEGIN
 
 END $$
 
-CREATE PROCEDURE LOGIN (IN agentUsername VARCHAR(16), IN passwordHash CHAR(64), IN newSessionKey CHAR(128), OUT wasSuccess BOOL)
+CREATE PROCEDURE LOGIN (IN agentName VARCHAR(16), IN passHash CHAR(64), IN newSessionKey CHAR(128), OUT wasSuccess BOOL)
 BEGIN
 	/*
     
@@ -113,25 +113,21 @@ BEGIN
     
     */
 
-	DECLARE existsSessionKey BOOL DEFAULT FALSE;
-
 	SET wasSuccess = FALSE;
     
     -- Check if the user has correct username and password
-	IF (EXISTS (SELECT Username FROM AGENT WHERE Username = agentUsername AND PasswordHash = passwordHash)) THEN
+	IF (EXISTS (SELECT Username FROM AGENT WHERE Username = agentName AND PasswordHash = passHash)) THEN
     BEGIN
-    
-		CALL AUTHENTICATE_AGENT (existsSessionKey);
         
         -- check if the user is already logged in (probably from another machine somewhere)
-        IF (existsSessionKey) THEN
+        IF (EXISTS (SELECT SessionKey FROM SESSION_KEY WHERE AgentUsername = agentName)) THEN
         BEGIN
         
 			-- if the user is already logged in
             -- then update the session key to the newly generated key
 			UPDATE SESSION_KEY
             SET SessionKey = newSessionKey
-            WHERE SessionKey = newSessionKey;
+            WHERE AgentUsername = agentName;
         
         END;
         ELSE
@@ -140,7 +136,7 @@ BEGIN
             -- if the user is not already logged in
             -- then give the user a new session key (new record in SESSION_KEY)
 			INSERT INTO SESSION_KEY (SessionKey, AgentUsername)
-            VALUES (newSessionKey, agentUsername);
+            VALUES (newSessionKey, agentName);
         
         END;
         END IF;

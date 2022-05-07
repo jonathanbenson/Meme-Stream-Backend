@@ -73,7 +73,23 @@ app.get('/register/:username/:password', (req, res) => {
 
 });
 
+app.get('/login/:username/:password', (req, res) => {
 
+	return query(`
+
+		SET @wasSuccess = FALSE;
+
+		CALL LOGIN ('${req.params.username}', '${hash(req.params.password)}', '${genSessionKey()}', @wasSuccess);
+
+		SELECT @wasSuccess AS wasSuccess;
+
+	`).then(result => {
+
+		res.json(result);
+
+	});
+
+});
 
 app.listen(serverPort, () => {
 	console.log(`App listening on port ${serverPort}...`)
@@ -122,5 +138,13 @@ function query(text) {
 function hash(text) {
 
 	return crypto.createHmac('sha256', secret).update(text).digest('hex');
+
+}
+
+function genSessionKey() {
+
+	const size = 128;
+
+	return [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
 
 }
