@@ -46,8 +46,8 @@ CREATE TABLE POST_LIKE (
 CREATE TABLE POST_COMMENT (
 	-- A user can comment on a post, and this table keeps track of those comments
     
-	AgentUsername VARCHAR(16) NOT NULL UNIQUE,
-    PostTitle VARCHAR(32) NOT NULL UNIQUE,
+	AgentUsername VARCHAR(16) NOT NULL,
+    PostTitle VARCHAR(32) NOT NULL,
     PostComment VARCHAR(512) NOT NULL,
     
     FOREIGN KEY (AgentUsername) REFERENCES AGENT (Username),

@@ -431,6 +431,145 @@ describe('stored procedures', () => {
 
     });
 
+    test('COMMENT_POST', () => {
+
+        const comment = "this is a comment";
+        const secondComment = "this is another comment";
+
+        const username = 'jonathan';
+        const passwordHash = hash('benson', secret);
+        const sessionKey = genSessionKey();
+
+        const invalidUsername = "x";
+        const invalidSessionKey = genSessionKey();
+
+        const postTitle = 'Post_Title';
+        const postFileExt = 'pfex';
+
+        return query(`
+
+            INSERT INTO AGENT (Username, PasswordHash)
+            VALUES ('${username}', '${passwordHash}');
+
+            INSERT INTO SESSION_KEY (AgentUsername, SessionKey)
+            VALUES ('${username}', '${sessionKey}');
+
+            INSERT INTO POST (Title, FileExt)
+            VALUES ('${postTitle}', '${postFileExt}');
+
+            CALL COMMENT_POST ('${username}', '${sessionKey}', '${postTitle}', '${comment}');
+
+            SELECT AgentUsername, PostTitle, PostComment
+            FROM POST_COMMENT
+            ORDER BY AgentUsername;
+
+        `).then(result => {
+            /*
+
+            Valid user with valid session key comments on a post.
+
+            New post should be inserted into database for the correct post.
+
+            */
+
+            const expectedPosts = [
+                {
+                  AgentUsername: 'jonathan',
+                  PostTitle: 'Post_Title',
+                  PostComment: 'this is a comment'
+                }
+              ];
+
+            const posts = result[4];
+
+            expect(posts).toEqual(expectedPosts);
+
+        }).then(() => query(`
+
+            CALL COMMENT_POST ('${username}', '${sessionKey}', '${postTitle}', '${secondComment}');
+
+            SELECT AgentUsername, PostTitle, PostComment
+            FROM POST_COMMENT
+            ORDER BY AgentUsername;
+
+        `)).then(result => {
+            /*
+
+            Valid user with valid session key comments on a post a second time (different comment).
+
+            New post should be inserted into database for the correct post.
+
+            */
+
+            const expectedPosts = [
+                {
+                  AgentUsername: 'jonathan',
+                  PostTitle: 'Post_Title',
+                  PostComment: 'this is a comment'
+                },
+                {
+                  AgentUsername: 'jonathan',
+                  PostTitle: 'Post_Title',
+                  PostComment: 'this is another comment'
+                }
+              ];
+
+            const posts = result[1];
+
+            expect(posts).toEqual(expectedPosts);
+
+        }).then(() => query(`
+
+            DELETE FROM POST_COMMENT;
+
+            CALL COMMENT_POST ('${invalidUsername}', '${sessionKey}', '${postTitle}', '${comment}');
+
+            SELECT AgentUsername, PostTitle, PostComment
+            FROM POST_COMMENT
+            ORDER BY AgentUsername;
+
+        `)).then(result => {
+            /*
+
+            Invalid user with valid session key tries to comment on a post.
+
+            No comment should be inserted.
+
+            */
+
+            const expectedPosts = [];
+
+            const posts = result[2];
+
+            expect(posts).toEqual(expectedPosts);
+
+        }).then(() => query(`
+
+            CALL COMMENT_POST ('${username}', '${invalidSessionKey}', '${postTitle}', '${comment}');
+
+            SELECT AgentUsername, PostTitle, PostComment
+            FROM POST_COMMENT
+            ORDER BY AgentUsername;
+
+        `)).then(result => {
+            /*
+
+            Valid user with invalid session key tries to comment on a post.
+
+            No comment should be inserted.
+
+            */
+
+            const expectedPosts = [];
+
+            const posts = result[1];
+
+            expect(posts).toEqual(expectedPosts);
+
+        });
+
+    });
+
 
 });
 
