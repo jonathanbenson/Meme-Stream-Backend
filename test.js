@@ -344,6 +344,35 @@ describe('stored procedures', () => {
 
         }).then(() => query(`
 
+            CALL LIKE_POST ('${username}', '${sessionKey}', '${postTitle}');
+
+            SELECT AgentUsername, PostTitle
+            FROM POST_LIKE
+            ORDER BY AgentUsername ASC;
+
+        `)).then(result => {
+            /*
+
+            Valid user likes the same post a second time.
+
+            There should be no changes to the database.
+
+            */
+
+            const expectedLikes = [
+                {
+                  AgentUsername: 'jonathan',
+                  PostTitle: 'Post_Title'
+                }
+            ];
+
+            const likes = result[1];
+
+            expect(likes).toEqual(expectedLikes);
+
+
+        }).then(() => query(`
+
             CALL LIKE_POST ('${invalidUsername}', '${sessionKey}', '${postTitle}');
 
             SET @existsLike = (
