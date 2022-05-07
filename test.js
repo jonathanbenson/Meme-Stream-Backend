@@ -11,6 +11,8 @@ const {
 
 describe('stored procedures', () => {
 
+    beforeEach(() => query('CALL CLEAN ()'));
+    afterAll(() => query('CALL CLEAN ()'));
 
     test('first test', () => {
 
