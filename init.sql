@@ -65,6 +65,7 @@ BEGIN
 
 	DELETE FROM POST_COMMENT;
     DELETE FROM POST_LIKE;
+    DELETE FROM POST;
     DELETE FROM SESSION_KEY;
     DELETE FROM AGENT;
     
@@ -182,7 +183,7 @@ BEGIN
 
 	SET @isAuthenticated = FALSE;
     
-    CALL AUTHENTICATE (agentName, sessionKey, @isAuthenticated);
+    CALL AUTHENTICATE_AGENT (agentName, sessionKey, @isAuthenticated);
     
     IF (@isAuthenticated AND NOT EXISTS (SELECT AgentUsername FROM POST_LIKE WHERE AgentUsername = agentName AND PostTitle = pTitle)) THEN
     BEGIN
@@ -206,7 +207,7 @@ BEGIN
 
 	SET @isAuthenticated = FALSE;
     
-    CALL AUTHENTICATE (agentName, sessionKey, @isAuthenticated);
+    CALL AUTHENTICATE_AGENT (agentName, sessionKey, @isAuthenticated);
     
     IF (@isAuthenticated) THEN
     BEGIN

@@ -294,6 +294,114 @@ describe('stored procedures', () => {
 
     });
 
+    test('LIKE_POST', () => {
+
+        const username = 'jonathan';
+        const passwordHash = hash('benson', secret);
+        const sessionKey = genSessionKey();
+
+        const invalidUsername = "x";
+        const invalidSessionKey = genSessionKey();
+
+        const postTitle = 'Post_Title';
+        const postFileExt = 'pfex';
+
+        return query(`
+
+            INSERT INTO AGENT (Username, PasswordHash)
+            VALUES ('${username}', '${passwordHash}');
+
+            INSERT INTO SESSION_KEY (AgentUsername, SessionKey)
+            VALUES ('${username}', '${sessionKey}');
+
+            INSERT INTO POST (Title, FileExt)
+            VALUES ('${postTitle}', '${postFileExt}');
+
+            CALL LIKE_POST ('${username}', '${sessionKey}', '${postTitle}');
+
+            SET @existsLike = (
+                EXISTS (
+                    SELECT AgentUsername
+                    FROM POST_LIKE
+                    WHERE AgentUsername = '${username}' AND PostTitle = '${postTitle}'
+                )
+            );
+
+            SELECT @existsLike AS existsLike;
+
+        `).then(result => {
+            /*
+
+            Valid user likes a post.
+
+            A new like should be inserted into the database.
+
+            */
+
+            const existsLike = result[5][0].existsLike;
+
+            expect(existsLike).toEqual(1);
+
+        }).then(() => query(`
+
+            CALL LIKE_POST ('${invalidUsername}', '${sessionKey}', '${postTitle}');
+
+            SET @existsLike = (
+                EXISTS (
+                    SELECT AgentUsername
+                    FROM POST_LIKE
+                    WHERE AgentUsername = '${invalidUsername}' AND PostTitle = '${postTitle}'
+                )
+            );
+
+            SELECT @existsLike AS existsLike;
+
+        `)).then(result => {
+            /*
+
+            Invalid user with valid session key tries to like a post.
+
+            No new like should be inserted into the database.
+
+            */
+
+            const existsLike = result[2][0].existsLike;
+
+            expect(existsLike).toEqual(0);
+
+        }).then(() => query(`
+
+            DELETE FROM POST_LIKE;
+
+            CALL LIKE_POST ('${username}', '${invalidSessionKey}', '${postTitle}');
+
+            SET @existsLike = (
+                EXISTS (
+                    SELECT AgentUsername
+                    FROM POST_LIKE
+                    WHERE AgentUsername = '${username}' AND PostTitle = '${postTitle}'
+                )
+            );
+
+            SELECT @existsLike AS existsLike;
+
+        `)).then(result => {
+            /*
+
+            Valid user with invalid session key tries to like a post.
+
+            No new like should be inserted into the database.
+
+            */
+
+            const existsLike = result[3][0].existsLike;
+
+            expect(existsLike).toEqual(0);
+
+        });
+
+    });
+
 
 });
 
