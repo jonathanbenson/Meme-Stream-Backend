@@ -83,9 +83,20 @@ app.get('/login/:username/:password', (req, res) => {
 
 		SELECT @wasSuccess AS wasSuccess;
 
-	`).then(result => {
+		SELECT SessionKey AS sessionKey
+		FROM SESSION_KEY
+		WHERE AgentUsername = '${req.params.username}'
+		LIMIT 1;
 
-		res.json(result);
+	`).then(result => {
+		
+		const wasSuccess = result[2][0].wasSuccess;
+		const sessionKey = result[3][0].sessionKey;
+
+		if (wasSuccess)
+			res.json({status: wasSuccess, key: sessionKey});
+		else
+			res.json({status: wasSuccess, key: null});
 
 	});
 
