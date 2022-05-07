@@ -30,6 +30,18 @@ CREATE TABLE POST (
     
 );
 
+CREATE TABLE POST_LIKE (
+	-- A user can like a post, and this table keeps track of those likes
+    
+	AgentUsername VARCHAR(16) NOT NULL UNIQUE,
+    PostTitle VARCHAR(32) NOT NULL UNIQUE,
+    
+    PRIMARY KEY (AgentUsername, PostTitle),
+    FOREIGN KEY (AgentUsername) REFERENCES AGENT (Username),
+    FOREIGN KEY (PostTitle) REFERENCES POST (Title)
+    
+);
+
 DELIMITER $$
 
 CREATE PROCEDURE CREATE_AGENT (IN agentUsername VARCHAR(16), IN passwordHash CHAR(64), OUT wasSuccess BOOL)
