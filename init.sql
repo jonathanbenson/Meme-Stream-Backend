@@ -179,3 +179,11 @@ BEGIN
         
 END $$
 
+
+INSERT INTO POST (Title, FileExt) VALUES ("Harry_Potter", "jpeg");
+INSERT INTO POST (Title, FileExt) VALUES ("John_Wick", "jpg");
+INSERT INTO POST (Title, FileExt) VALUES ("Pursuit_of_Depression", "jpeg");
+INSERT INTO POST (Title, FileExt) VALUES ("Sick_Day", "jpg");
+INSERT INTO POST (Title, FileExt) VALUES ("Sleepover", "jpg");
+INSERT INTO POST (Title, FileExt) VALUES ("Year_2020", "jpeg");
+
