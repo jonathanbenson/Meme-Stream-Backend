@@ -1,4 +1,12 @@
 
+const {
+	
+    secret,
+    hash,
+    genSessionKey,
+    query
+
+} = require('./server_helper');
 
 
 describe('stored procedures', () => {
