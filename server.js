@@ -1,9 +1,13 @@
 
+const mysql = require('mysql');
 const express = require('express');
 const dotenv = require('dotenv');
-const app = express();
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
+
+const app = express();
+app.use(express.json());
 
 dotenv.config();
 
@@ -15,6 +19,7 @@ DB_USERNAME
 DB_PASSWORD
 DB_NAME
 DB_PORT
+SECRET
 SERVER_PORT
 
 
@@ -24,13 +29,16 @@ const dbUsername = process.env.DB_USERNAME;
 const dbPassword = process.env.DB_PASSWORD;
 const dbName = process.env.DB_NAME;
 const dbPort = process.env.DB_PORT;
+const secret = process.env.SECRET;
 const serverPort = process.env.SERVER_PORT;
 
 console.log("DB_USERNAME: " + dbUsername);
 console.log("DB_PASSWORD: " + dbPassword);
 console.log("DB_NAME: " + dbName);
 console.log("DB_PORT: " + dbPort);
+console.log("SECRET: " + secret);
 console.log("SERVER_PORT: " + serverPort + "\n\n");
+
 
 app.get('/', (req, res) => {
 	res.send("Hello World!");
@@ -47,6 +55,23 @@ app.get('/post/:title/:fileExt', (req, res) => {
 
 });
 
+app.get('/register/:username/:password', (req, res) => {
+
+	return query(`
+
+		SET @message = "";
+
+		CALL CREATE_AGENT ('${req.params.username}', '${hash(req.params.password)}', @message);
+
+		SELECT @message as message;
+
+	`).then(result => {
+
+		res.json(result);
+
+	});
+
+});
 
 
 
@@ -94,3 +119,8 @@ function query(text) {
 
 }
 
+function hash(text) {
+
+	return crypto.createHmac('sha256', secret).update(text).digest('hex');
+
+}
