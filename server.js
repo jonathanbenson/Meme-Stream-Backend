@@ -15,12 +15,12 @@ dotenv.config();
 
 .env file should have the following variables defined:
 
-DB_USERNAME
-DB_PASSWORD
-DB_NAME
-DB_PORT
-SECRET
-SERVER_PORT
+DB_USERNAME -> username of database user
+DB_PASSWORD -> password of database user
+DB_NAME -> name of the MySQL database
+DB_PORT -> database port
+SECRET -> a secret key that is factored into the hashing of passwords
+SERVER_PORT -> port that the server listens on for requests
 
 
 */
@@ -59,48 +59,26 @@ app.get('/register/:username/:password', (req, res) => {
 
 	return query(`
 
-		SET @message = "";
-
-		CALL CREATE_AGENT ('${req.params.username}', '${hash(req.params.password)}', @message);
-
-		SELECT @message as message;
-
-	`).then(result => {
-
-		res.json(result);
-
-	});
-
-});
-
-app.get('/login/:username/:password', (req, res) => {
-
-	return query(`
-
 		SET @wasSuccess = FALSE;
 
-		CALL LOGIN ('${req.params.username}', '${hash(req.params.password)}', '${genSessionKey()}', @wasSuccess);
+		CALL CREATE_AGENT ('${req.params.username}', '${hash(req.params.password)}', @wasSuccess);
 
 		SELECT @wasSuccess AS wasSuccess;
 
-		SELECT SessionKey AS sessionKey
-		FROM SESSION_KEY
-		WHERE AgentUsername = '${req.params.username}'
-		LIMIT 1;
-
 	`).then(result => {
-		
+
 		const wasSuccess = result[2][0].wasSuccess;
-		const sessionKey = result[3][0].sessionKey;
 
 		if (wasSuccess)
-			res.json({status: wasSuccess, key: sessionKey});
+			return loginHelper(req, res);
 		else
-			res.json({status: wasSuccess, key: null});
+			res.json({status: 0, key: null});
 
 	});
 
 });
+
+app.get('/login/:username/:password', (req, res) => loginHelper(req, res));
 
 app.listen(serverPort, () => {
 	console.log(`App listening on port ${serverPort}...`)
@@ -157,5 +135,34 @@ function genSessionKey() {
 	const size = 128;
 
 	return [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+
+}
+
+function loginHelper(req, res) {
+
+	return query(`
+
+		SET @wasSuccess = FALSE;
+
+		CALL LOGIN ('${req.params.username}', '${hash(req.params.password)}', '${genSessionKey()}', @wasSuccess);
+
+		SELECT @wasSuccess AS wasSuccess;
+
+		SELECT SessionKey AS sessionKey
+		FROM SESSION_KEY
+		WHERE AgentUsername = '${req.params.username}'
+		LIMIT 1;
+
+	`).then(result => {
+		
+		const wasSuccess = result[2][0].wasSuccess;
+		const sessionKey = result[3][0].sessionKey;
+
+		if (wasSuccess)
+			res.json({status: wasSuccess, key: sessionKey});
+		else
+			res.json({status: wasSuccess, key: null});
+
+	});
 
 }

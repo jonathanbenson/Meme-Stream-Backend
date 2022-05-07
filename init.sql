@@ -48,7 +48,7 @@ CREATE TABLE POST_RATING (
 
 DELIMITER $$
 
-CREATE PROCEDURE CREATE_AGENT (IN agentUsername VARCHAR(16), IN passwordHash CHAR(64), OUT message VARCHAR(32))
+CREATE PROCEDURE CREATE_AGENT (IN agentUsername VARCHAR(16), IN passwordHash CHAR(64), OUT wasSuccess BOOL)
 BEGIN
     /*
 
@@ -65,8 +65,7 @@ BEGIN
 		INSERT INTO AGENT (Username, PasswordHash)
         VALUES (agentUsername, passwordHash);
     
-		-- output a success message
-		SET message = "SUCCESS";
+		SET wasSuccess = TRUE;
     
     END;
     ELSE
@@ -74,7 +73,7 @@ BEGIN
 		
         -- if the user already exists in the database
         -- then output an error message
-        SET message = "ERROR - Username already exists!";
+        SET wasSuccess = FALSE;
         
     END;
     END IF;
