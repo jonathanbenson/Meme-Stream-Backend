@@ -42,6 +42,19 @@ CREATE TABLE POST_LIKE (
     
 );
 
+
+CREATE TABLE POST_COMMENT (
+	-- A user can comment on a post, and this table keeps track of those comments
+    
+	AgentUsername VARCHAR(16) NOT NULL UNIQUE,
+    PostTitle VARCHAR(32) NOT NULL UNIQUE,
+    PostComment VARCHAR(512) NOT NULL,
+    
+    FOREIGN KEY (AgentUsername) REFERENCES AGENT (Username),
+    FOREIGN KEY (PostTitle) REFERENCES POST (Title)
+    
+);
+
 DELIMITER $$
 
 CREATE PROCEDURE CREATE_AGENT (IN agentUsername VARCHAR(16), IN passwordHash CHAR(64), OUT wasSuccess BOOL)
@@ -161,6 +174,30 @@ BEGIN
     
 		INSERT INTO POST_LIKE (AgentUsername, PostTitle)
         VALUES (agentName, pTitle);
+    
+    END;
+    END IF;
+
+END $$
+
+CREATE PROCEDURE COMMENT_POST (IN agentName VARCHAR(16), IN sessionKey CHAR(128), IN pTitle VARCHAR(32), IN newComment VARCHAR(512))
+BEGIN
+	/*
+    
+    Inserts a new record into POST_COMMENT with the agent's username and post title
+    ... a user can comment as many times on a post as they want
+    
+    */
+
+	SET @isAuthenticated = FALSE;
+    
+    CALL AUTHENTICATE (agentName, sessionKey, @isAuthenticated);
+    
+    IF (@isAuthenticated) THEN
+    BEGIN
+    
+		INSERT INTO POST_COMMENT (AgentUsername, PostTitle, PostComment)
+        VALUES (agentName, pTitle, newComment);
     
     END;
     END IF;
