@@ -104,7 +104,7 @@ BEGIN
 
 END $$
 
-CREATE PROCEDURE AUTHENTICATE_AGENT (IN agentUsername VARCHAR(16), IN sessionKey CHAR(128), OUT isValid BOOL)
+CREATE PROCEDURE AUTHENTICATE_AGENT (IN agentUsername VARCHAR(16), IN sKey CHAR(128), OUT isValid BOOL)
 BEGIN
     /*
 
@@ -117,7 +117,7 @@ BEGIN
 	SET isValid = FALSE;
     
     -- check if there is an entry in SESSION_KEY where the username and session key match those provided
-    IF (EXISTS (SELECT AgentUsername FROM SESSION_KEY WHERE AgentUsername = agentUsername AND SessionKey = sessionKey)) THEN
+    IF (EXISTS (SELECT AgentUsername FROM SESSION_KEY WHERE AgentUsername = agentUsername AND SessionKey = sKey)) THEN
     BEGIN
     
 		-- if there is a match, then the user is authenticated
