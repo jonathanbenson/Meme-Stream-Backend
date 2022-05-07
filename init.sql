@@ -25,7 +25,8 @@ CREATE TABLE SESSION_KEY (
 CREATE TABLE POST (
 	-- Table to keep track of posts
     -- The actual post content will be kept in folder on the server
-	Title VARCHAR(32) PRIMARY KEY NOT NULL UNIQUE
+	Title VARCHAR(32) PRIMARY KEY NOT NULL UNIQUE,
+    FileExt VARCHAR(4) NOT NULL
     
 );
 

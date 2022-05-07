@@ -2,6 +2,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const app = express();
+const path = require('path');
 
 dotenv.config();
 
@@ -33,6 +34,15 @@ console.log("SERVER_PORT: " + serverPort + "\n\n");
 app.get('/', (req, res) => {
 	res.send("Hello World!");
 });
+
+app.get('/post/:title/:fileExt', (req, res) => {
+
+	res.sendFile(path.join(__dirname, 'content', `${req.params.title}.${req.params.fileExt}`));
+
+});
+
+
+
 
 app.listen(serverPort, () => {
 	console.log(`App listening on port ${serverPort}...`)
