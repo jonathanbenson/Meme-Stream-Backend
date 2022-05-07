@@ -14,6 +14,15 @@ CREATE TABLE AGENT (
     
 );
 
+CREATE TABLE SESSION_KEY (
+	-- Authentication for users when they login and interact with the app
+    -- The keys will expire after a certain amount of time being inactive
+    
+	SessionKey CHAR(128) PRIMARY KEY NOT NULL UNIQUE,
+	AgentUsername VARCHAR(16) NOT NULL,
+    LastUpdated TIMESTAMP NOT NULL
+    
+);
 
 CREATE TABLE POST (
 	-- Table to keep track of posts
