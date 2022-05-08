@@ -29,6 +29,22 @@ app.get('/', (req, res) => {
 	res.send("Hello World!");
 });
 
+app.get('/posts', (req, res) => {
+
+	return query(`
+
+		SELECT Title AS title, FileExt AS ext
+		FROM POST
+		ORDER BY RAND();
+
+	`).then(result => {
+
+		res.json(result);
+
+	});
+
+});
+
 app.get('/post/:title/:fileExt', (req, res) => {
 	// Sends the content of a post to the client
 
@@ -73,6 +89,8 @@ app.get('/login/:username/:password', (req, res) => loginHelper(req, res));
 app.listen(serverPort, () => {
 	// Starts server listening
 	console.log(`App listening on port ${serverPort}...`)
+
+	return query('CALL CLEAN (); CALL INIT ();');
 });
 
 
