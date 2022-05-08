@@ -80,6 +80,21 @@ app.get('/like/:username/:sessionKey/:postTitle', (req, res) => {
 
 });
 
+app.get('/likes/:postTitle', (req, res) => {
+
+	return query(`
+
+		SELECT AgentUsername AS username
+		FROM POST_LIKE
+		WHERE PostTitle = '${req.params.postTitle}';
+
+	`).then(result => {
+
+		res.json(result);
+
+	});
+});
+
 
 app.listen(serverPort, () => {
 	// Starts server listening
