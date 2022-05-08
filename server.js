@@ -56,14 +56,7 @@ app.get('/register/:username/:password', (req, res) => {
 
 // Logs a user into the database
 // Resets their session key
-app.get('/login/:username/:password', (req, res) => {
-	
-	if (req.params.sessionKey == null)
-		res.json({status: 0, key: null});
-	else
-		return loginHelper(req, res);
-
-});
+app.get('/login/:username/:password', (req, res) => loginHelper(req, res));
 
 app.get('/like/:username/:sessionKey/:postTitle', (req, res) => {
 
@@ -122,6 +115,10 @@ function loginHelper(req, res) {
 			res.json({status: wasSuccess, key: sessionKey});
 		else
 			res.json({status: wasSuccess, key: null});
+
+	}).catch(err => {
+
+		res.json({status: 0, key: null});
 
 	});
 
