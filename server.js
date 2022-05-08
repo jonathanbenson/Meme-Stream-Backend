@@ -84,8 +84,6 @@ app.get('/like/:username/:sessionKey/:postTitle', (req, res) => {
 app.listen(serverPort, () => {
 	// Starts server listening
 	console.log(`App listening on port ${serverPort}...`)
-
-	return query('CALL CLEAN (); CALL INIT ();');
 });
 
 
