@@ -29,33 +29,6 @@ app.get('/', (req, res) => {
 	res.send("Hello World!");
 });
 
-app.get('/posts', (req, res) => {
-
-	return query(`
-
-		SELECT Title AS title, FileExt AS ext
-		FROM POST
-		ORDER BY RAND();
-
-	`).then(result => {
-
-		res.json(result);
-
-	});
-
-});
-
-app.get('/post/:title/:fileExt', (req, res) => {
-	// Sends the content of a post to the client
-
-	const filePath = path.join(__dirname, 'content', `${req.params.title}.${req.params.fileExt}`);
-
-	if (fs.existsSync(filePath))
-		res.sendFile(filePath);
-	else
-		res.send("Could not load content");
-
-});
 
 app.get('/register/:username/:password', (req, res) => {
 	// Creates a new user in the database
