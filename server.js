@@ -56,7 +56,36 @@ app.get('/register/:username/:password', (req, res) => {
 
 // Logs a user into the database
 // Resets their session key
-app.get('/login/:username/:password', (req, res) => loginHelper(req, res));
+app.get('/login/:username/:password', (req, res) => {
+	
+	if (req.params.sessionKey == null)
+		res.json({status: 0, key: null});
+	else
+		return loginHelper(req, res);
+
+});
+
+app.get('/like/:username/:sessionKey/:postTitle', (req, res) => {
+
+	return query(`
+
+		CALL LIKE_POST ('${req.params.username}', '${req.params.sessionKey}', '${req.params.postTitle}');
+
+	`).then(result => {
+
+		console.log(result);
+
+		res.json({status: 1});
+
+	}).catch(err => {
+
+		console.log(err);
+
+		res.json({status: 0});
+
+	});
+
+});
 
 
 app.listen(serverPort, () => {

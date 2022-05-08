@@ -32,8 +32,8 @@ CREATE TABLE POST (
 CREATE TABLE POST_LIKE (
 	-- A user can like a post, and this table keeps track of those likes
     
-	AgentUsername VARCHAR(16) NOT NULL UNIQUE,
-    PostTitle VARCHAR(32) NOT NULL UNIQUE,
+	AgentUsername VARCHAR(16) NOT NULL,
+    PostTitle VARCHAR(32) NOT NULL,
     
     PRIMARY KEY (AgentUsername, PostTitle),
     FOREIGN KEY (AgentUsername) REFERENCES AGENT (Username),
