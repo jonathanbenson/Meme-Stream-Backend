@@ -304,7 +304,6 @@ describe('stored procedures', () => {
         const invalidSessionKey = genSessionKey();
 
         const postTitle = 'Post_Title';
-        const postFileExt = 'pfex';
 
         return query(`
 
@@ -314,8 +313,8 @@ describe('stored procedures', () => {
             INSERT INTO SESSION_KEY (AgentUsername, SessionKey)
             VALUES ('${username}', '${sessionKey}');
 
-            INSERT INTO POST (Title, FileExt)
-            VALUES ('${postTitle}', '${postFileExt}');
+            INSERT INTO POST (Title)
+            VALUES ('${postTitle}');
 
             CALL LIKE_POST ('${username}', '${sessionKey}', '${postTitle}');
 
@@ -444,7 +443,6 @@ describe('stored procedures', () => {
         const invalidSessionKey = genSessionKey();
 
         const postTitle = 'Post_Title';
-        const postFileExt = 'pfex';
 
         return query(`
 
@@ -454,8 +452,8 @@ describe('stored procedures', () => {
             INSERT INTO SESSION_KEY (AgentUsername, SessionKey)
             VALUES ('${username}', '${sessionKey}');
 
-            INSERT INTO POST (Title, FileExt)
-            VALUES ('${postTitle}', '${postFileExt}');
+            INSERT INTO POST (Title)
+            VALUES ('${postTitle}');
 
             CALL COMMENT_POST ('${username}', '${sessionKey}', '${postTitle}', '${comment}');
 

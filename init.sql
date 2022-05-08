@@ -24,9 +24,8 @@ CREATE TABLE SESSION_KEY (
 
 CREATE TABLE POST (
 	-- Table to keep track of posts
-    -- The actual post content will be kept in folder on the server
-	Title VARCHAR(32) PRIMARY KEY NOT NULL UNIQUE,
-    FileExt VARCHAR(4) NOT NULL
+    -- The actual post content will be kept in the android app
+	Title VARCHAR(32) PRIMARY KEY NOT NULL UNIQUE
     
 );
 
@@ -61,12 +60,12 @@ CREATE PROCEDURE INIT ()
 BEGIN
 	-- Initializes the database with stock content
     
-	INSERT INTO POST (Title, FileExt) VALUES ("Harry_Potter", "jpeg");
-	INSERT INTO POST (Title, FileExt) VALUES ("John_Wick", "jpg");
-	INSERT INTO POST (Title, FileExt) VALUES ("Pursuit_of_Depression", "jpeg");
-	INSERT INTO POST (Title, FileExt) VALUES ("Sick_Day", "jpg");
-	INSERT INTO POST (Title, FileExt) VALUES ("Sleepover", "jpg");
-	INSERT INTO POST (Title, FileExt) VALUES ("Year_2020", "jpeg");
+	INSERT INTO POST (Title) VALUES ("Harry_Potter");
+	INSERT INTO POST (Title) VALUES ("John_Wick");
+	INSERT INTO POST (Title) VALUES ("Pursuit_of_Depression");
+	INSERT INTO POST (Title) VALUES ("Sick_Day");
+	INSERT INTO POST (Title) VALUES ("Sleepover");
+	INSERT INTO POST (Title) VALUES ("Year_2020");
     
 END $$
 
