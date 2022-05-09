@@ -66,13 +66,29 @@ app.get('/like/:username/:sessionKey/:postTitle', (req, res) => {
 
 	`).then(result => {
 
-		console.log(result);
+		res.json({status: 1});
+
+	}).catch(err => {
+
+		res.json({status: 0});
+
+	});
+
+});
+
+app.get('/comment/:username/:sessionKey/:postTitle/:comment', (req, res) => {
+
+	return query(`
+
+		CALL COMMENT_POST ('${req.params.username}', '${req.params.sessionKey}', '${req.params.postTitle}', '${req.params.comment}');
+
+	`).then(result => {
 
 		res.json({status: 1});
 
 	}).catch(err => {
 
-		console.log(err);
+		console.log(err)
 
 		res.json({status: 0});
 
@@ -86,6 +102,21 @@ app.get('/likes/:postTitle', (req, res) => {
 
 		SELECT AgentUsername AS username
 		FROM POST_LIKE
+		WHERE PostTitle = '${req.params.postTitle}';
+
+	`).then(result => {
+
+		res.json(result);
+
+	});
+});
+
+app.get('/comments/:postTitle', (req, res) => {
+
+	return query(`
+
+		SELECT AgentUsername AS username, PostComment AS comment
+		FROM POST_COMMENT
 		WHERE PostTitle = '${req.params.postTitle}';
 
 	`).then(result => {
