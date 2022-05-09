@@ -235,5 +235,5 @@ END $$
 
 DELIMITER ;
 
-
+CALL INIT ();
 
